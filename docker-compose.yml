@@ -1,0 +1,141 @@
+version: '3.8'
+
+# ============================================================
+# Proyecto Vet_Seguridad - Veterinaria Huellitas
+# Orquestación de contenedores con docker-compose
+# Autor: Fernanda Mendoza
+# Fecha: Octubre 2026
+# ============================================================
+
+services:
+  # --------------------------------------------------------
+  # MySQL-1 (Maestro)
+  # IP: 192.168.20.12 | VLAN: 20
+  # --------------------------------------------------------
+  mysql-1:
+    build: ./dockerfiles/mysql-1
+    container_name: mysql-1
+    hostname: mysql-1
+    networks:
+      core:
+        ipv4_address: 192.168.20.12
+    volumes:
+      - mysql1_data:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=
+      - MYSQL_DATABASE=veterinaria_db
+    restart: unless-stopped
+
+  # --------------------------------------------------------
+  # MySQL-2 (Esclavo - Replica)
+  # IP: 192.168.20.13 | VLAN: 20
+  # --------------------------------------------------------
+  mysql-2:
+    build: ./dockerfiles/mysql-2
+    container_name: mysql-2
+    hostname: mysql-2
+    networks:
+      core:
+        ipv4_address: 192.168.20.13
+    volumes:
+      - mysql2_data:/var/lib/mysql
+    depends_on:
+      - mysql-1
+    restart: unless-stopped
+
+  # --------------------------------------------------------
+  # DNS (dnsmasq)
+  # IP: 192.168.20.20 | VLAN: 20
+  # --------------------------------------------------------
+  dns:
+    build: ./dockerfiles/dns
+    container_name: dns
+    hostname: dns
+    networks:
+      core:
+        ipv4_address: 192.168.20.20
+    restart: unless-stopped
+
+  # --------------------------------------------------------
+  # Backend (Flask)
+  # IP: 192.168.20.10 | VLAN: 20 | Puerto: 80
+  # --------------------------------------------------------
+  backend:
+    build: ./dockerfiles/backend
+    container_name: backend
+    hostname: backend
+    networks:
+      core:
+        ipv4_address: 192.168.20.10
+    depends_on:
+      - mysql-1
+      - dns
+    restart: unless-stopped
+
+  # --------------------------------------------------------
+  # Frontend-1 (Nginx + HTTPS)
+  # IP: 192.168.30.10 | VLAN: 30 | Puerto: 443
+  # --------------------------------------------------------
+  frontend-1:
+    build: ./dockerfiles/frontend-1
+    container_name: frontend-1
+    hostname: frontend-1
+    networks:
+      dmz:
+        ipv4_address: 192.168.30.10
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  # --------------------------------------------------------
+  # Frontend-2 (Nginx + HTTPS)
+  # IP: 192.168.30.11 | VLAN: 30 | Puerto: 443
+  # --------------------------------------------------------
+  frontend-2:
+    build: ./dockerfiles/frontend-2
+    container_name: frontend-2
+    hostname: frontend-2
+    networks:
+      dmz:
+        ipv4_address: 192.168.30.11
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  # --------------------------------------------------------
+  # Load-Balancer (HAProxy)
+  # IP: 192.168.30.5 | VLAN: 30 | Puerto: 443
+  # --------------------------------------------------------
+  load-balancer:
+    build: ./dockerfiles/load-balancer
+    container_name: load-balancer
+    hostname: load-balancer
+    networks:
+      dmz:
+        ipv4_address: 192.168.30.5
+    depends_on:
+      - frontend-1
+      - frontend-2
+    restart: unless-stopped
+
+# ============================================================
+# Redes (equivalen a las VLANs del proyecto)
+# ============================================================
+networks:
+  core:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.20.0/24
+  dmz:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.30.0/24
+
+# ============================================================
+# Volúmenes persistentes (para las bases de datos)
+# ============================================================
+volumes:
+  mysql1_data:
+  mysql2_data:
