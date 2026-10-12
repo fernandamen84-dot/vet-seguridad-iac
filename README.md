@@ -18,44 +18,45 @@ Aplicación web de gestión veterinaria desplegada en GNS3 con Docker, aplicando
 
 ### Topología
 
-[Webterm]
-↓
+             [Webterm]
+             
+                  ↓
 
-veterinaria.local
+           veterinaria.local
 
-↓
+                  ↓
 
-[LOAD-BALANCER: 192.168.30.5]
+      [LOAD-BALANCER: 192.168.30.5]
 
-(HAProxy - Puerto 443)
+          (HAProxy - Puerto 443)
 
-↙ ↘
+           ↙                ↘
 
-[FRONTEND-1] [FRONTEND-2]
+     [FRONTEND-1]       [FRONTEND-2]
 
-(192.168.30.10) (192.168.30.11)
+   (192.168.30.10)    (192.168.30.11)
 
-(Nginx + HTTPS) (Nginx + HTTPS)
+   (Nginx + HTTPS)    (Nginx + HTTPS)
 
-↘ ↙
+            ↘            ↙
 
-[BACKEND: 192.168.20.10]
+        [BACKEND: 192.168.20.10]
 
-(Flask - Puerto 80)
+           (Flask - Puerto 80)
 
-↓
+                  ↓
 
-┌─────────┴─────────┐
-
-↓ ↓
+    ┌─────────────┴─────────────────┐
+    
+    ↓                               ↓
 
 [MYSQL-1: .12] ←──replica──→ [MYSQL-2: .13]
 
-(Maestro) (Esclavo)
+   (Maestro)                   (Esclavo)
 
-[DNS: 192.168.20.20]
+          [DNS: 192.168.20.20]
 
-[PC1: 192.168.10.10]
+          [PC1: 192.168.10.10]
 
 
 
@@ -75,7 +76,7 @@ veterinaria.local
 | R1 | 10.0.0.1 / 192.168.x.1 | - | - | Router core |
 | R2 | 10.0.0.2 / 192.168.100.1 | - | - | Router externo (NAT) |
 
----
+
 
 ## Características de Seguridad Implementadas
 
@@ -108,6 +109,7 @@ veterinaria.local
 - Resuelve `veterinaria.local` → 192.168.30.5 (Load-Balancer).
 - Reenvía consultas externas a 8.8.8.8 y 1.1.1.1.
 
+
 ### 6. Subnetting
 | VLAN | Red | Máscara | Uso |
 |------|-----|---------|-----|
@@ -117,12 +119,13 @@ veterinaria.local
 | WAN | 10.0.0.0/30 | /30 | Enlace R1-R2 |
 | Externa | 192.168.100.0/24 | /24 | Red externa |
 
+
 ### 7. IaC (Infrastructure as Code)
 - Dockerfiles para cada contenedor.
 - `docker-compose.yml` para orquestación.
 - Documentación completa en este repositorio.
 
----
+
 
 ## Estructura del Proyecto
 
@@ -134,7 +137,7 @@ vet-seguridad-iac/
 └── Dockerfile # Ejemplo de Dockerfile del Backend
 
 
----
+
 
 ## Despliegue con docker-compose
 
