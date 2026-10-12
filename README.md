@@ -1,6 +1,6 @@
 # Proyecto Vet_Seguridad - Veterinaria Huellitas
 
-## 📋 Descripción
+## Descripción
 
 Aplicación web de gestión veterinaria desplegada en GNS3 con Docker, aplicando:
 - **Modelo de 3 capas** (Frontend, Backend, Base de Datos)
@@ -12,32 +12,49 @@ Aplicación web de gestión veterinaria desplegada en GNS3 con Docker, aplicando
 - **Subnetting** por VLANs
 - **IaC (Infrastructure as Code)** con Dockerfiles y docker-compose
 
----
 
-## 🏗️ Arquitectura de Red
+
+## Arquitectura de Red
 
 ### Topología
 
 [Webterm]
 ↓
+
 veterinaria.local
+
 ↓
+
 [LOAD-BALANCER: 192.168.30.5]
+
 (HAProxy - Puerto 443)
+
 ↙ ↘
+
 [FRONTEND-1] [FRONTEND-2]
+
 (192.168.30.10) (192.168.30.11)
+
 (Nginx + HTTPS) (Nginx + HTTPS)
+
 ↘ ↙
+
 [BACKEND: 192.168.20.10]
+
 (Flask - Puerto 80)
+
 ↓
+
 ┌─────────┴─────────┐
+
 ↓ ↓
+
 [MYSQL-1: .12] ←──replica──→ [MYSQL-2: .13]
+
 (Maestro) (Esclavo)
 
 [DNS: 192.168.20.20]
+
 [PC1: 192.168.10.10]
 
 
@@ -60,7 +77,7 @@ veterinaria.local
 
 ---
 
-## 🔒 Características de Seguridad Implementadas
+## Características de Seguridad Implementadas
 
 ### 1. HTTPS/TLS
 - Certificados SSL autofirmados generados con OpenSSL.
@@ -107,7 +124,7 @@ veterinaria.local
 
 ---
 
-## 📦 Estructura del Proyecto
+## Estructura del Proyecto
 
 vet-seguridad-iac/
 ├── README.md # Este archivo
@@ -119,7 +136,7 @@ vet-seguridad-iac/
 
 ---
 
-## 🚀 Despliegue con docker-compose
+## Despliegue con docker-compose
 
 **Nota:** Este `docker-compose.yml` es una representación de la arquitectura. En el proyecto real se usa GNS3 con contenedores Docker individuales.
 
